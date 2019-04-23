@@ -46,7 +46,7 @@ def read_dht11_dat(currentTime):
 	GPIO.output(DHT, GPIO.LOW)
 	time.sleep(0.02)
 	GPIO.setup(DHT, GPIO.IN, GPIO.PUD_UP)
-	
+
 	unchanged_count = 0
 	last = -1
 	data = []
@@ -196,7 +196,7 @@ def draw_menu(stdscr):
 		if result:
 			humidity, temperature, = result
 			textfile.write("%s, %s, %s\n" % (humidity, temperature, currentTime))
-		
+
 		# Collect min/max info
 		if (temperature > max_temp_record):
 			max_temp_record = temperature
@@ -235,8 +235,8 @@ def draw_menu(stdscr):
 
 		# Rendering title
 		stdscr.addstr(1, start_x_title, title)
-		stdscr.addstr(start_y_graphs - 4 - temp_bar_height, int(width // 3) , "{} Degrees".format(temperature))
-		stdscr.addstr(start_y_graphs - 4 - humid_bar_height, int(width // 3) * 2 , "{} Percent".format(humidity))
+		stdscr.addstr(start_y_graphs - 4 - temp_bar_height, int(width // 3) + 1, "{} Degrees".format(temperature))
+		stdscr.addstr(start_y_graphs - 4 - humid_bar_height, int(width // 3) * 2 + 1, "{} Percent".format(humidity))
 
 		# Turning off attributes for title
 		stdscr.attroff(curses.color_pair(2))
@@ -269,13 +269,13 @@ def draw_menu(stdscr):
 		# Fill whitespace in bar graph
 		stdscr.attron(curses.color_pair(3))
 		for x in range(0, temp_bar_height):
-			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3), "           ")
+			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3), "            ")
 		for x in range(0, humid_bar_height):
-			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2, "           ")
+			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2, "            ")
 		stdscr.attroff(curses.color_pair(3))
 
 		stdscr.move(0, 0)
-	
+
 		# Oscillate the LED on/off to indicate each file write
 		GPIO.output(LED_2, GPIO.HIGH)
 		time.sleep(0.5)

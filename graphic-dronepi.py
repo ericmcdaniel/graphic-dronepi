@@ -97,7 +97,6 @@ def read_dht11_dat(currentTime):
 			else:
 				continue
 	if len(lengths) != 40:
-		# print("\tCorrupt Data\t\t   Time: %s Seconds" % (currentTime))
 		return False
 
 	shortest_pull_up = min(lengths)
@@ -123,7 +122,6 @@ def read_dht11_dat(currentTime):
 			byte = 0
 	checksum = (the_bytes[0] + the_bytes[1] + the_bytes[2] + the_bytes[3]) & 0xFF
 	if the_bytes[4] != checksum:
-		# print ("\tCorrupt Data\t\tTime: %s Seconds" % (currentTime))
 		return False
 
 	return the_bytes[0], the_bytes[2]
@@ -131,6 +129,10 @@ def read_dht11_dat(currentTime):
 def draw_menu(stdscr):
 	min_temp = 20
 	max_temp = 40
+	max_temp_record  = -1
+	max_humid_record = -1
+	min_temp_record  = 101
+	min_humid_record = 101
 
 	# Clear and refresh the screen for a blank canvas
 	stdscr.clear()
@@ -183,23 +185,32 @@ def draw_menu(stdscr):
 	while (currentTime < 600) and (GPIO.input(23) == GPIO.HIGH):
 		stdscr.clear()
 		currentTime += 1
+		reset_timer = 0
 		result = read_dht11_dat(currentTime)
 
 		while (result == False):
 			result = read_dht11_dat(currentTime)
 			time.sleep(0.01)
+			reset_timer += 0.01
 
 		if result:
 			humidity, temperature, = result
-			# print("Humidity: %s%%,  Temperature: %s. C, Time: %s Seconds" % (humidity, temperature, currentTime))
 			textfile.write("%s, %s, %s\n" % (humidity, temperature, currentTime))
-		else:
-			textfile.write("-1, -1, %s\n" % (currentTime))
+		
+		# Collect min/max info
+		if (temperature > max_temp_record):
+			max_temp_record = temperature
+		if (temperature < min_temp_record):
+			min_temp_record = temperature
+		if (humidity > max_humid_record):
+			max_humid_record = humidity
+		if (humidity < min_humid_record):
+			min_humid_record = humidity
 
 		# Declaration of strings
 		title = "Atmospheric Sensing"[:width-1]
 		subtitle = "Collecting Atmospheric Pollution and Emission Data Utilizing a Raspberry Pi computer on a Hexacopter Drone"[:width-1]
-		developers = "Written by: Eric McDaniel -  University of Wisconsin - Fox Valley"[:width-1]
+		developers = "Written by: Eric McDaniel - University of Wisconsin - Fox Valley"[:width-1]
 		statusbarstr = "Press 'Ctrl - C' to exit"
 
 		# Centering calculations
@@ -241,22 +252,28 @@ def draw_menu(stdscr):
 		stdscr.addstr(start_y_graphs, int(width // 3) * 2 + 1, "Humidity")
 		stdscr.addstr(start_y_graphs - 2, int(width // 3) * 2 - 4, "0%")
 		stdscr.addstr(end_y_graphs, int(width // 3) * 2 - 5, "100%")
-		timer = "Progression: {} seconds".format(currentTime)
-		stdscr.addstr(6, int((width // 2) - (len(timer) // 2) - len(timer) % 2), timer)
 
+		# Center screen summary stats
+		timer = "Duration: {} seconds".format(currentTime)
+		stdscr.addstr(int(height // 2 - 4), int((width // 2) - 7), "Summary Stats")
+		stdscr.addstr(int(height // 2 - 3), int((width // 2) - 7), "-------------")
+		stdscr.addstr(int(height // 2 - 2), int((width // 2) - (len(timer) // 2) - len(timer) % 2), timer)
+		stdscr.addstr(int(height // 2 - 1), int((width // 2) - 11), "Min/Max Temp: {}/{} C".format(min_temp_record, max_temp_record))
+		stdscr.addstr(int(height // 2), int((width // 2) - 13), "Min/Max Humidity: {}/{} %".format(min_humid_record, max_humid_record))
+
+		# Print vertical pipes left of bar graph
 		for x in range(0, barlength - 3):
 			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) - 7, "|")
 		for x in range(0, barlength - 3):
 			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2 - 4, "|")
 
-		# Design bar graph
+		# Fill whitespace in bar graph
 		stdscr.attron(curses.color_pair(3))
 		for x in range(0, temp_bar_height):
 			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3), "           ")
 		for x in range(0, humid_bar_height):
 			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2, "           ")
-
-		stdscr.attroff(curses.color_pair(3))		
+		stdscr.attroff(curses.color_pair(3))
 
 		stdscr.move(0, 0)
 	
@@ -264,8 +281,8 @@ def draw_menu(stdscr):
 		GPIO.output(LED_2, GPIO.HIGH)
 		time.sleep(0.5)
 		GPIO.output(LED_2, GPIO.LOW)
-		time.sleep(0.45)
-		# stdscr.clear()
+		if (reset_timer < 0.45):
+			time.sleep(0.45 -  reset_timer)
 		stdscr.refresh()
 	textfile.close()
 

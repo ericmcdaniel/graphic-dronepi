@@ -1,14 +1,14 @@
 '''
 **********************************************************************
-* Filename: atmosphere-sensing.py
-* Description : A script run by UW Fox Valley drone fitted with a
-*   Raspberry Pi 3B+. This script collects measurable
-*   atmospheric data when the drone is in flight.
+* Filename : graphic-dronepi.py
+* Description : A curses application run by UW Fox Valley drone fitted 
+*               with a Raspberry Pi 3B+. This script collects
+*               measurable atmospheric data when the drone is in flight
 * Author  : Eric McDaniel - University of Wisconsin - Fox Valley
 * E-mail  : mcdae6861@students.uwc.edu
-* Website : https://github.com/McDanielES/atmosphere-sensing
-* Version : 1.3
-* Update  : 2/25/19
+* Website : https://github.com/McDanielES/graphic-dronepi
+* Version : 2.0
+* Update  : 4/23/19
 **********************************************************************
 '''
 
@@ -210,8 +210,8 @@ def draw_menu(stdscr):
 		# Declaration of strings
 		title = "Atmospheric Sensing"[:width-1]
 		subtitle = "Collecting Atmospheric Pollution and Emission Data Utilizing a Raspberry Pi computer on a Hexacopter Drone"[:width-1]
-		developers = "Written by: Eric McDaniel - University of Wisconsin - Fox Valley"[:width-1]
-		statusbarstr = "Press 'Ctrl - C' to exit"
+		developers = "Software developed by: Eric McDaniel - University of Wisconsin - Fox Valley"[:width-1]
+		statusbarstr = "Press Ctrl + C to exit, or flip the drone's toggle switch"
 
 		# Centering calculations
 		start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
@@ -242,16 +242,21 @@ def draw_menu(stdscr):
 		stdscr.attroff(curses.color_pair(2))
 		stdscr.attroff(curses.A_BOLD)
 
-		# Print rest of title
+		# Print subtitle and bargraph information
 		stdscr.addstr(2, start_x_subtitle, subtitle)
 		stdscr.addstr(3, start_x_developers, developers)
-
 		stdscr.addstr(start_y_graphs, int(width // 3), "Temperature")
 		stdscr.addstr(start_y_graphs - 2, int(width // 3) - 12, "{} degrees".format(min_temp))
 		stdscr.addstr(end_y_graphs, int(width // 3) - 12, "{} degrees".format(max_temp))
 		stdscr.addstr(start_y_graphs, int(width // 3) * 2 + 1, "Humidity")
 		stdscr.addstr(start_y_graphs - 2, int(width // 3) * 2 - 4, "0%")
 		stdscr.addstr(end_y_graphs, int(width // 3) * 2 - 5, "100%")
+
+		# Print vertical pipes left of bar graph
+		for x in range(0, barlength - 3):
+			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) - 7, "|")
+		for x in range(0, barlength - 3):
+			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2 - 4, "|")
 
 		# Center screen summary stats
 		timer = "Duration: {} seconds".format(currentTime)
@@ -260,12 +265,6 @@ def draw_menu(stdscr):
 		stdscr.addstr(int(height // 2 - 2), int((width // 2) - (len(timer) // 2) - len(timer) % 2), timer)
 		stdscr.addstr(int(height // 2 - 1), int((width // 2) - 11), "Min/Max Temp: {}/{} C".format(min_temp_record, max_temp_record))
 		stdscr.addstr(int(height // 2), int((width // 2) - 13), "Min/Max Humidity: {}/{} %".format(min_humid_record, max_humid_record))
-
-		# Print vertical pipes left of bar graph
-		for x in range(0, barlength - 3):
-			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) - 7, "|")
-		for x in range(0, barlength - 3):
-			stdscr.addstr(start_y_graphs - 3 - x, int(width // 3) * 2 - 4, "|")
 
 		# Fill whitespace in bar graph
 		stdscr.attron(curses.color_pair(3))
@@ -290,10 +289,9 @@ def main():
 	setup()
 	curses.wrapper(draw_menu)
 
-	print("Done. Normal Termination.\n")
-
 	# Cleanup GPIO, turn off LEDs.
 	destroy()
+	print("Done. Normal Termination.\n")
 
 def destroy():
 	GPIO.cleanup()

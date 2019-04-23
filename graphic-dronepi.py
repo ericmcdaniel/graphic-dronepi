@@ -219,7 +219,7 @@ def draw_menu(stdscr):
 		start_x_developers = int((width // 2) - (len(developers) // 2) - len(developers) % 2)
 		start_y_graphs = int((height) - 5)
 		end_y_graphs = int(10)
-		barlength = start_y_graphs - end_y_graphs
+		barlength = start_y_graphs - end_y_graphs - 1
 		temp_bar_height = ((temperature - min_temp) * barlength) / (max_temp - min_temp)
 		humid_bar_height = (humidity * barlength) / 100
 

@@ -1,5 +1,6 @@
-# Atmospheric Sensing
+# Graphic DronePi
 ### Utilizing a Raspberry Pi on a Hexacopter Drone to Visualize Atmospheric Pollution 
+#### A console-based graphical interface for simplified data interpretation.
 ![David and Saleh fitting the Raspberry Pi onto the drone](https://i.imgur.com/7DZwYuq.jpg)
 
 ---

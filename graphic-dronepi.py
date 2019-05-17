@@ -208,10 +208,10 @@ def draw_menu(stdscr):
 			min_humid_record = humidity
 
 		# Declaration of strings
-		title = "Atmospheric Sensing"[:width-1]
-		subtitle = "Collecting Atmospheric Pollution and Emission Data Utilizing a Raspberry Pi computer on a Hexacopter Drone"[:width-1]
+		title      = "Atmospheric Sensing"[:width-1]
+		subtitle   = "Collecting Atmospheric Pollution and Emission Data Utilizing a Raspberry Pi computer on a Hexacopter Drone"[:width-1]
 		developers = "Software developed by: Eric McDaniel - University of Wisconsin - Fox Valley"[:width-1]
-		statusbarstr = "Press Ctrl + C to exit, or flip the drone's toggle switch"
+		statusbar  = "Press Ctrl + C to exit, or flip the drone's toggle switch"
 
 		# Centering calculations
 		start_x_title = int((width // 2) - (len(title) // 2) - len(title) % 2)
@@ -225,8 +225,8 @@ def draw_menu(stdscr):
 
 		# Render status bar
 		stdscr.attron(curses.color_pair(3))
-		stdscr.addstr(height-1, 0, statusbarstr)
-		stdscr.addstr(height-1, len(statusbarstr), " " * (width - len(statusbarstr) - 1))
+		stdscr.addstr(height-1, 0, statusbar )
+		stdscr.addstr(height-1, len(statusbar ), " " * (width - len(statusbar ) - 1))
 		stdscr.attroff(curses.color_pair(3))
 
 		# Turning on attributes for title
@@ -283,13 +283,15 @@ def draw_menu(stdscr):
 		if (reset_timer < 0.45):
 			time.sleep(0.45 -  reset_timer)
 		stdscr.refresh()
+
+	# Close text file when program terminates
 	textfile.close()
 
 def main():
 	setup()
 	curses.wrapper(draw_menu)
 
-	# Cleanup GPIO, turn off LEDs.
+	# Cleanup GPIO, turn off LEDs
 	destroy()
 	print("Done. Normal Termination.\n")
 

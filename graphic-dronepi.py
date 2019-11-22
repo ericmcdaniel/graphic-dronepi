@@ -1,14 +1,21 @@
+#!/usr/bin/python
 '''
 **********************************************************************
-* Filename : graphic-dronepi.py
-* Description : A curses application run by UW Fox Valley drone fitted 
+* Filename    : graphic-dronepi.py
+* Description : A curses application run by the UW Fox Valley drone fitted 
 *               with a Raspberry Pi 3B+. This script collects
-*               measurable atmospheric data when the drone is in flight
-* Author  : Eric McDaniel - University of Wisconsin - Fox Valley
-* E-mail  : mcdae6861@students.uwc.edu
-* Website : https://github.com/McDanielES/graphic-dronepi
-* Version : 2.0
-* Update  : 4/23/19
+*               measurable atmospheric data when the drone is in flight.
+*               Raw data is written into a text file which can be plotted
+*               on to Microsoft Excel or MATLAB for further analysis.
+*               This program's main intention is to be run headless when
+*               the drone is in flight, however if the Pi is connected to
+*               a network via SSH or other means, a curses console
+*               visualization is created in real-time to present the data.
+* Author      : Eric McDaniel - University of Wisconsin - Fox Valley
+* E-mail      : McDanielES@gmail.com
+* Website     : https://github.com/McDanielES/graphic-dronepi
+* Version     : 2.1
+* Update      : 11/22/19
 **********************************************************************
 '''
 
@@ -24,13 +31,14 @@ LED_1 = 27  # BCM: 27 (Board: 13)
 LED_2 = 22  # BCM: 22 (Board: 15)
 PUD   = 23  # BCM: 23 (Board: 16)
 
-MAX_UNCHANGE_COUNT = 100
-STATE_INIT_PULL_DOWN   = 1
-STATE_INIT_PULL_UP = 2
+MAX_UNCHANGE_COUNT         = 100
+STATE_INIT_PULL_DOWN       = 1
+STATE_INIT_PULL_UP         = 2
 STATE_DATA_FIRST_PULL_DOWN = 3
-STATE_DATA_PULL_UP = 4
-STATE_DATA_PULL_DOWN   = 5
+STATE_DATA_PULL_UP         = 4
+STATE_DATA_PULL_DOWN       = 5
 
+# Sets up the red and green LEDs for positive read/write feedback
 def setup():
 	GPIO.setmode(GPIO.BCM)
 	GPIO.setup(LED_1, GPIO.OUT)
@@ -39,6 +47,8 @@ def setup():
 	GPIO.output(LED_2, GPIO.LOW)
 	GPIO.setup(PUD, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
+# Adapted from Adafruit's DHT11 humiture sensor sample
+# code, returns the temperature and humidity
 def read_dht11_dat(currentTime):
 	GPIO.setup(DHT, GPIO.OUT)
 	GPIO.output(DHT, GPIO.HIGH)
@@ -126,6 +136,8 @@ def read_dht11_dat(currentTime):
 
 	return the_bytes[0], the_bytes[2]
 
+# Initiates the curses framework, taking the raw data array and
+# drawing bargraphs proportional to the size of the TTY window.
 def draw_menu(stdscr):
 	min_temp = 20
 	max_temp = 40
@@ -185,7 +197,7 @@ def draw_menu(stdscr):
 	while (currentTime < 600) and (GPIO.input(23) == GPIO.HIGH):
 		stdscr.clear()
 		currentTime += 1
-		reset_timer = 0
+		reset_timer =  0
 		result = read_dht11_dat(currentTime)
 
 		while (result == False):
@@ -302,5 +314,6 @@ if __name__ == '__main__':
 	try:
 		main()
 	except KeyboardInterrupt:
-		print("Done. Normal Termination.\n")
+		print("Done. Keyboard Termination initiated.\n")
 		destroy()
+  

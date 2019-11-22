@@ -45,7 +45,7 @@ def setup():
 	GPIO.output(LED_1, GPIO.LOW)
 	GPIO.setup(LED_2, GPIO.OUT)
 	GPIO.output(LED_2, GPIO.LOW)
-	GPIO.setup(PUD, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+	GPIO.setup(PUD, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 
 # Adapted from Adafruit's DHT11 humiture sensor sample
 # code, returns the temperature and humidity
@@ -305,7 +305,7 @@ def main():
 
 	# Cleanup GPIO, turn off LEDs
 	destroy()
-	print("Done. Normal Termination.\n")
+	print("Done. Normal termination by toggle switch.\n")
 
 def destroy():
 	GPIO.cleanup()
@@ -314,6 +314,6 @@ if __name__ == '__main__':
 	try:
 		main()
 	except KeyboardInterrupt:
-		print("Done. Keyboard Termination initiated.\n")
+		print("Done. Normal termination by initiated by keyboard.\n")
 		destroy()
   
